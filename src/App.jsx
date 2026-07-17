@@ -1,6 +1,5 @@
 import React from "react";
 
-// Temporary test version of your app root
 export default function App() {
   return (
     <div
