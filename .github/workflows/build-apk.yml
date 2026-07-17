@@ -28,10 +28,11 @@ jobs:
       - name: Install Cordova globally
         run: npm install -g cordova
 
-      - name: Install Cordova Android platform
+      - name: Install Cordova Android 12 inside repo Cordova folder
         run: |
           cd cordova
           npm install
+          cordova platform add android@12
 
       - name: Copy Vite build into Cordova www
         run: |
@@ -41,7 +42,6 @@ jobs:
       - name: Build APK
         run: |
           cd cordova
-          cordova platform add android
           cordova build android
 
       - name: Find APK file
@@ -55,21 +55,3 @@ jobs:
         with:
           name: mdgn-cordova-apk
           path: ${{ steps.find_apk.outputs.APK_PATH }}
-      - name: Copy web assets
-        run: npx cap copy
-
-      - name: Clean Gradle cache (IMPORTANT FIX)
-        run: |
-          rm -rf ~/.gradle/caches/
-          rm -rf ~/.gradle/wrapper/
-
-      - name: Build APK
-        run: |
-          cd android
-          ./gradlew --no-daemon --warning-mode all assembleRelease
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mdgn-app-apk
-          path: android/app/build/outputs/apk/release/app-release.apk
