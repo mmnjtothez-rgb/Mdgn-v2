@@ -1,5 +1,5 @@
-import LivePlayerScreen from './screens/LivePlayer/LivePlayerScreen.jsx'
+import LivePlayerScreen from "./screens/LivePlayer/LivePlayerScreen.jsx";
 
 export default function App() {
-  return <LivePlayerScreen />
+  return <LivePlayerScreen />;
 }
