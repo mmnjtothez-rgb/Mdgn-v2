@@ -2,9 +2,6 @@ name: Build MDGN Cordova APK
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 jobs:
   build:
@@ -28,41 +25,33 @@ jobs:
       - name: Install Cordova globally
         run: npm install -g cordova
 
-      # FULL RESET — remove ALL cached Cordova Android data
-      - name: Reset Cordova Android platform completely
+      # Create a REAL Cordova project (this is the missing step)
+      - name: Create Cordova project
         run: |
-          rm -rf cordova/platforms/android
-          rm -rf cordova/plugins
-          rm -rf cordova/node_modules
-          rm -f cordova/package-lock.json
-
-      # Install Cordova Android 12 cleanly
-      - name: Install Cordova Android 12 inside repo Cordova folder
-        run: |
+          cordova create cordova com.mdgn.app mdgnapp
           cd cordova
-          npm install
           cordova platform add android@12
 
-      # Copy Vite build into Cordova www
+      # Copy Vite build into Cordova
       - name: Copy Vite build into Cordova www
         run: |
           rm -rf cordova/www/*
           cp -r dist/* cordova/www/
 
-      # Build the APK
+      # Build APK
       - name: Build APK
         run: |
           cd cordova
           cordova build android
 
-      # Find the generated APK file
+      # Find APK
       - name: Find APK file
         id: find_apk
         run: |
           APK_PATH=$(find cordova/platforms/android -name "*.apk" | head -n 1)
           echo "APK_PATH=$APK_PATH" >> $GITHUB_OUTPUT
 
-      # Upload the APK as an artifact
+      # Upload APK
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
