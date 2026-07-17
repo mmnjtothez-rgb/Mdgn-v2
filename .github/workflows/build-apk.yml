@@ -25,8 +25,9 @@ jobs:
       - name: Build Vite project
         run: npm run build
 
-      - name: Install Capacitor
-        run: npm install @capacitor/core @capacitor/cli
+      - name: Install Capacitor core + CLI + Android
+        run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android
 
       - name: Initialize Capacitor
         run: npx cap init mdgn-app com.mdgn.app --web-dir=dist
