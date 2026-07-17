@@ -42,10 +42,16 @@ jobs:
       - name: Build APK
         run: |
           cd cordova-app
-          cordova build android --release
+          cordova build android
+
+      - name: Find APK file
+        id: find_apk
+        run: |
+          APK_PATH=$(find cordova-app/platforms/android -name "*.apk" | head -n 1)
+          echo "APK_PATH=$APK_PATH" >> $GITHUB_OUTPUT
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: mdgn-cordova-apk
-          path: cordova-app/platforms/android/app/build/outputs/apk/release/app-release.apk
+          path: ${{ steps.find_apk.outputs.APK_PATH }}
