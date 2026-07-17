@@ -28,19 +28,22 @@ jobs:
       - name: Install Cordova globally
         run: npm install -g cordova
 
-      # IMPORTANT: Remove old Android platform so Cordova does NOT reuse it
-      - name: Remove old Android platform
+      # FULL RESET — remove ALL cached Cordova Android data
+      - name: Reset Cordova Android platform completely
         run: |
           rm -rf cordova/platforms/android
+          rm -rf cordova/plugins
+          rm -rf cordova/node_modules
+          rm -f cordova/package-lock.json
 
-      # Install Cordova Android 12 (compatible with Gradle 9)
+      # Install Cordova Android 12 cleanly
       - name: Install Cordova Android 12 inside repo Cordova folder
         run: |
           cd cordova
           npm install
           cordova platform add android@12
 
-      # Copy Vite build into Cordova's WebView folder
+      # Copy Vite build into Cordova www
       - name: Copy Vite build into Cordova www
         run: |
           rm -rf cordova/www/*
