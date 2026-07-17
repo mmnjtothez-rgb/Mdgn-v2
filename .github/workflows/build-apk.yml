@@ -1,4 +1,4 @@
-name: Build MDGN APK
+name: Build MDGN Cordova APK
 
 on:
   workflow_dispatch:
@@ -19,22 +19,42 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Install Vite dependencies
         run: npm install
 
       - name: Build Vite project
         run: npm run build
 
-      - name: Install Capacitor core + CLI + Android
+      - name: Install Cordova globally
+        run: npm install -g cordova
+
+      - name: Install Cordova Android platform
         run: |
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          cd cordova
+          npm install
 
-      - name: Initialize Capacitor
-        run: npx cap init mdgn-app com.mdgn.app --web-dir=dist
+      - name: Copy Vite build into Cordova www
+        run: |
+          rm -rf cordova/www/*
+          cp -r dist/* cordova/www/
 
-      - name: Add Android platform
-        run: npx cap add android
+      - name: Build APK
+        run: |
+          cd cordova
+          cordova platform add android
+          cordova build android
 
+      - name: Find APK file
+        id: find_apk
+        run: |
+          APK_PATH=$(find cordova/platforms/android -name "*.apk" | head -n 1)
+          echo "APK_PATH=$APK_PATH" >> $GITHUB_OUTPUT
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mdgn-cordova-apk
+          path: ${{ steps.find_apk.outputs.APK_PATH }}
       - name: Copy web assets
         run: npx cap copy
 
