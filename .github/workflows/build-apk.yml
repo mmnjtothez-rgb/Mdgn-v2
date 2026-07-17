@@ -28,28 +28,38 @@ jobs:
       - name: Install Cordova globally
         run: npm install -g cordova
 
+      # IMPORTANT: Remove old Android platform so Cordova does NOT reuse it
+      - name: Remove old Android platform
+        run: |
+          rm -rf cordova/platforms/android
+
+      # Install Cordova Android 12 (compatible with Gradle 9)
       - name: Install Cordova Android 12 inside repo Cordova folder
         run: |
           cd cordova
           npm install
           cordova platform add android@12
 
+      # Copy Vite build into Cordova's WebView folder
       - name: Copy Vite build into Cordova www
         run: |
           rm -rf cordova/www/*
           cp -r dist/* cordova/www/
 
+      # Build the APK
       - name: Build APK
         run: |
           cd cordova
           cordova build android
 
+      # Find the generated APK file
       - name: Find APK file
         id: find_apk
         run: |
           APK_PATH=$(find cordova/platforms/android -name "*.apk" | head -n 1)
           echo "APK_PATH=$APK_PATH" >> $GITHUB_OUTPUT
 
+      # Upload the APK as an artifact
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
